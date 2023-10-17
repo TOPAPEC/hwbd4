@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  postgres-master:
+    image: bitnami/postgresql-repmgr:latest
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: adminpassword
+      POSTGRESQL_USERNAME: customuser
+      POSTGRESQL_PASSWORD: custompassword
+      POSTGRESQL_DATABASE: customdatabase
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master
+      REPMGR_PARTNER_NODES: postgres-master,postgres-slave
+      REPMGR_NODE_NAME: node-1
+      REPMGR_NODE_NETWORK_NAME: postgres-master
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d/
+      - postgres_master_data:/bitnami/postgresql
+
+  postgres-slave:
+    image: bitnami/postgresql-repmgr:latest
+    environment:
+      POSTGRESQL_POSTGRES_PASSWORD: adminpassword
+      POSTGRESQL_USERNAME: customuser
+      POSTGRESQL_PASSWORD: custompassword
+      POSTGRESQL_DATABASE: customdatabase
+      REPMGR_PASSWORD: repmgrpassword
+      REPMGR_PRIMARY_HOST: postgres-master
+      REPMGR_PARTNER_NODES: postgres-master,postgres-slave
+      REPMGR_NODE_NAME: node-2
+      REPMGR_NODE_NETWORK_NAME: postgres-slave
+    ports:
+      - "5433:5432"
+    depends_on:
+      - postgres-master
+    volumes:
+      - postgres_slave_data:/bitnami/postgresql
+
+volumes:
+  postgres_master_data:
+    driver: local
+  postgres_slave_data:
+    driver: local
