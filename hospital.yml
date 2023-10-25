@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  postgres-master:
+  hospital-master:
     image: bitnami/postgresql-repmgr:latest
     environment:
       POSTGRESQL_POSTGRES_PASSWORD: BUGRIENKO_216
@@ -9,17 +9,17 @@ services:
       POSTGRESQL_PASSWORD: BUGRIENKO_216
       POSTGRESQL_DATABASE: BUGRIENKO_216
       REPMGR_PASSWORD: repmgrpassword
-      REPMGR_PRIMARY_HOST: postgres-master
-      REPMGR_PARTNER_NODES: postgres-master,postgres-slave
-      REPMGR_NODE_NAME: node-1
-      REPMGR_NODE_NETWORK_NAME: postgres-master
+      REPMGR_PRIMARY_HOST: hospital-master
+      REPMGR_PARTNER_NODES: hospital-master,hospital-slave
+      REPMGR_NODE_NAME: node-5
+      REPMGR_NODE_NETWORK_NAME: hospital-master
     ports:
-      - "5432:5432"
+      - "5436:5432"
     volumes:
-      - ./sql:/docker-entrypoint-initdb.d
-      - postgres_master_data:/bitnami/postgresql
+      - ./sql/hospital:/docker-entrypoint-initdb.d
+      - hospital_master_data:/bitnami/postgresql
 
-  postgres-slave:
+  hospital-slave:
     image: bitnami/postgresql-repmgr:latest
     environment:
       POSTGRESQL_POSTGRES_PASSWORD: adminpassword
@@ -27,19 +27,19 @@ services:
       POSTGRESQL_PASSWORD: custompassword
       POSTGRESQL_DATABASE: customdatabase
       REPMGR_PASSWORD: repmgrpassword
-      REPMGR_PRIMARY_HOST: postgres-master
-      REPMGR_PARTNER_NODES: postgres-master,postgres-slave
-      REPMGR_NODE_NAME: node-2
-      REPMGR_NODE_NETWORK_NAME: postgres-slave
+      REPMGR_PRIMARY_HOST: hospital-master
+      REPMGR_PARTNER_NODES: hospital-master,hospital-slave
+      REPMGR_NODE_NAME: node-6
+      REPMGR_NODE_NETWORK_NAME: hospital-slave
     ports:
-      - "5433:5432"
+      - "5437:5432"
     depends_on:
-      - postgres-master
+      - hospital-master
     volumes:
-      - postgres_slave_data:/bitnami/postgresql
+      - hospital_slave_data:/bitnami/postgresql
 
 volumes:
-  postgres_master_data:
+  hospital_master_data:
     driver: local
-  postgres_slave_data:
+  hospital_slave_data:
     driver: local
